@@ -7,7 +7,7 @@ public class AuctionServiceHttpClient {
 
     private readonly HttpClient _client;
     private readonly IConfiguration _config;
-    public AuctionServiceHttpClient(HttpClient client, IConfiguration config){
+    public AuctionServiceHttpClient(HttpClient client, IConfiguration config) {
         _client = client;
         _config = config;
     }
@@ -18,6 +18,6 @@ public class AuctionServiceHttpClient {
             .Project(item => item.UpdatedAt.ToString())
             .ExecuteFirstAsync();
 
-        return await _client.GetFromJsonAsync<List<Item>>(_config["AuctionServiceUrl"] + "?date=" + lastUpdated);    
+        return await _client.GetFromJsonAsync<List<Item>>(_config["AuctionServiceUrl"] + "/api/auctions?date=" + lastUpdated);
     }
 }

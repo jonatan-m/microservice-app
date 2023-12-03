@@ -26,6 +26,11 @@ builder.Services.AddMassTransit(x => {
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
 
     x.UsingRabbitMq((context, cfg) => {
+        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", host => {
+            host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
+            host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
+        });
+
         cfg.ConfigureEndpoints(context);
     });
 });
@@ -41,9 +46,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    
+if (app.Environment.IsDevelopment()) {
+
 }
 
 app.UseAuthentication();
@@ -51,10 +55,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-try{
+try {
     DbInitializer.InitDb(app);
-}
-catch(Exception e){
+} catch (Exception e) {
     Console.WriteLine(e);
 }
 

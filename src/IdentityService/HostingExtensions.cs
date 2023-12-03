@@ -7,10 +7,8 @@ using Serilog;
 
 namespace IdentityService;
 
-internal static class HostingExtensions
-{
-    public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
-    {
+internal static class HostingExtensions {
+    public static WebApplication ConfigureServices(this WebApplicationBuilder builder) {
         builder.Services.AddRazorPages();
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -26,6 +24,10 @@ internal static class HostingExtensions
                 options.Events.RaiseInformationEvents = true;
                 options.Events.RaiseFailureEvents = true;
                 options.Events.RaiseSuccessEvents = true;
+
+                if (builder.Environment.IsEnvironment("Docker")) {
+                    options.IssuerUri = "identity-svc";
+                }
 
                 // see https://docs.duendesoftware.com/identityserver/v6/fundamentals/resources/
                 //options.EmitStaticAudienceClaim = true;
@@ -44,13 +46,11 @@ internal static class HostingExtensions
 
         return builder.Build();
     }
-    
-    public static WebApplication ConfigurePipeline(this WebApplication app)
-    { 
+
+    public static WebApplication ConfigurePipeline(this WebApplication app) {
         app.UseSerilogRequestLogging();
-    
-        if (app.Environment.IsDevelopment())
-        {
+
+        if (app.Environment.IsDevelopment()) {
             app.UseDeveloperExceptionPage();
         }
 
@@ -58,7 +58,7 @@ internal static class HostingExtensions
         app.UseRouting();
         app.UseIdentityServer();
         app.UseAuthorization();
-        
+
         app.MapRazorPages()
             .RequireAuthorization();
 
