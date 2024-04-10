@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MongoDB.Entities;
-using ZstdSharp.Unsafe;
+
 
 namespace SearchService;
 
@@ -8,12 +8,10 @@ namespace SearchService;
 [Route("api/search")]
 public class SearchController : ControllerBase {
     [HttpGet]
-    public async Task<ActionResult<List<Item>>> SearchItems([FromQuery]SearchParams searchParams){
+    public async Task<ActionResult<List<Item>>> SearchItems([FromQuery] SearchParams searchParams) {
         var query = DB.PagedSearch<Item, Item>();
 
-        query.Sort(item => item.Ascending(item => item.Make));
-
-        if(!string.IsNullOrEmpty(searchParams.SearchTerm)) {
+        if (!string.IsNullOrEmpty(searchParams.SearchTerm)) {
             query.Match(Search.Full, searchParams.SearchTerm).SortByTextScore();
         }
 
@@ -30,11 +28,11 @@ public class SearchController : ControllerBase {
             _ => query.Match(item => item.AuctionEnd > DateTime.UtcNow)
         };
 
-        if(!string.IsNullOrEmpty(searchParams.Seller)) {
+        if (!string.IsNullOrEmpty(searchParams.Seller)) {
             query.Match(item => item.Seller == searchParams.Seller);
         }
 
-        if(!string.IsNullOrEmpty(searchParams.Winnner)) {
+        if (!string.IsNullOrEmpty(searchParams.Winnner)) {
             query.Match(item => item.Winner == searchParams.Winnner);
         }
 
